@@ -56,8 +56,9 @@ class BackgroundOptionsViewLayout : BaseCustomConstraintLayout {
         setTopBarName(context.getString(R.string.text_background))
         setState()
         setColorTextAdapter()
+
         checkboxBlur.setOnCheckedChangeListener { buttonView, isChecked ->
-//            saveState()
+            saveState()
         }
         seekBarBlur.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {

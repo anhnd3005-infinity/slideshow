@@ -37,7 +37,7 @@ import java.io.IOException
 
 class BitmapProcessor(
     private val source: Bitmap,
-    val isBlur: Boolean,
+    val isBlur: Boolean = true,
     val progressBlur: Int,
     val colorBackgroud: Int
 ) {
@@ -77,7 +77,7 @@ class BitmapProcessor(
 
         val bitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-
+        canvas.drawColor(colorBackgroud)
         val (dstRect: Rect, fill: Boolean) = when (cropType) {
             FIT_CENTER -> fitCenterRect() to false
             FIT_START -> fitStartRect() to false
@@ -101,7 +101,7 @@ class BitmapProcessor(
                 canvas.drawBitmap(bg, null, backgroundFillRect(), null)
             }else{
                 val bg = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-                canvas.drawBitmap(bg, null, backgroundFillRect(), bgPaint)
+                canvas.drawBitmap(bg, null, backgroundFillRect(), null)
             }
             //handle background
         }

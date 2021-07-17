@@ -163,7 +163,15 @@ class VideoComposer(private val context: Context) : StudioDrawable {
 
             val hash = scene.id
             var scaledBitmap: Bitmap = if (bitmapCache.contains(hash + cropType.key())) {
-                bitmapCache.get(hash + cropType.key())!!
+                val original = BitmapProcessor.loadSync(scene.originalPath)
+//                var lastBitmap :Bitmap = bitmapCache.get(hash + cropType.key())!!
+                val bitmapProcessor = BitmapProcessor(original, isBlur, progressBlur,colorBackgroud)
+                bitmapProcessor.crop(videoSize.width, videoSize.height)
+                bitmapProcessor.cropType(cropType)
+                val bmp = bitmapProcessor.proceedSync()
+                bitmapCache.set(hash + cropType.key(), bmp)
+                original.recycle()
+                bmp
 
             } else {
                 val original = BitmapProcessor.loadSync(scene.originalPath)
