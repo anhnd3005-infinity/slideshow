@@ -22,10 +22,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -112,6 +114,21 @@ public class BitmapUtils {
                 / ratio));
 
         return new BitmapSize(scaledWidth, scaledHeight);
+    }
+
+    public static Bitmap getBitmapFromAsset(Context context, String filePath) {
+        AssetManager assetManager = context.getAssets();
+
+        InputStream istr;
+        Bitmap bitmap = null;
+        try {
+            istr = assetManager.open(filePath);
+            bitmap = BitmapFactory.decodeStream(istr);
+        } catch (IOException e) {
+             Log.d("Ynsuper", "IOException getBitmapFromAsset:"+ e.getLocalizedMessage());
+        }
+
+        return bitmap;
     }
 
     public static class BitmapSize {

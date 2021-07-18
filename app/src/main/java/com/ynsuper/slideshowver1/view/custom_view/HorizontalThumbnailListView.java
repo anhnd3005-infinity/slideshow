@@ -26,6 +26,7 @@ import com.ynsuper.slideshowver1.callback.IHorizontalListChange;
 import com.ynsuper.slideshowver1.callback.ImageGroupListener;
 import com.ynsuper.slideshowver1.callback.MusicGroupListener;
 import com.ynsuper.slideshowver1.util.VideoComposer;
+import com.ynsuper.slideshowver1.util.editvideo.BitmapUtils;
 import com.ynsuper.slideshowver1.view.LittleBox;
 import com.ynsuper.slideshowver1.viewmodel.SlideShowViewModel;
 
@@ -83,6 +84,7 @@ public class HorizontalThumbnailListView extends View {
     private Paint mTextPaint;
     private Paint mTextMusicPaint;
     private Paint mScaleLinePaint;
+    private Paint mLinePaintTransition;
     private int lastIndex = -1;
     private int bottomSlideImageHeight;
     private String textMusicSong = DEFAULT_MUSIC_NAME;
@@ -157,9 +159,9 @@ public class HorizontalThumbnailListView extends View {
 //                ", vertical padding: " + mPaddingVerticalHeight +
 //                ", image width: " + mImageWidth +
 //                " image width: " + mImageHeight);
-
         drawImageGroup(canvas);
-        drawImageUtility(canvas);
+//        drawImageUtility(canvas);
+
         invalidate();
     }
 
@@ -194,9 +196,26 @@ public class HorizontalThumbnailListView extends View {
 //                Log.d(TAG, "Image group hidden, so skip this!");
                 continue;
             }
-            imageGroup.drawImageInGroup(canvas, curPos);
+            imageGroup.drawImageInGroup(canvas, curPos, imageGroup.imageTransition);
+            // draw transition
+            Bitmap bitmapTransition = BitmapUtils.resizeBitmap(BitmapUtils.getBitmapFromAsset(getContext(), imageGroup.imageTransition),
+                    100, 100);
+            if (bitmapTransition != null) {
+                canvas.drawLine(mImageDstRect.right + mPaddingVerticalHeight * 2 - mLinePaintTransition.getStrokeWidth() / 2,
+                        (mImageDstRect.top) * 2 - 2,
+                        mImageDstRect.right + mPaddingVerticalHeight * 2 - mLinePaintTransition.getStrokeWidth() / 2,
+                        mImageDstRect.bottom + mPaddingVerticalHeight * 3, mLinePaintTransition
+                );
+                canvas.drawCircle(mImageDstRect.right + mPaddingVerticalHeight * 2- mLinePaintTransition.getStrokeWidth()/2,
+                        (mImageDstRect.top) * 2, 8, mLinePaintTransition);
+                canvas.drawBitmap(bitmapTransition,
+                        mImageDstRect.right - bitmapTransition.getWidth() / 2 + mPaddingVerticalHeight * 2,
+                        mImageDstRect.bottom + mPaddingVerticalHeight * 3, null);
+            }
+
             curPos += imageGroup.getWidth() + mGroupPaddingWidth;
         }
+
 
         mPaint.setColor(mPaddingColor);
 
@@ -339,19 +358,19 @@ public class HorizontalThumbnailListView extends View {
         mItemUtilityGroupList.clear();
     }
 
-    public void newImageGroup(List<ImageItem> imageItemList) {
+    public void newImageGroup(List<ImageItem> imageItemList, String imageTransition) {
         if (imageItemList == null || imageItemList.size() == 0) {
             Log.e(TAG, "Image item list can not be null or empty!");
             return;
         }
 
         if (mImageGroupList.size() == 0) {
-            mImageGroupList.add(new ImageGroup(0, imageItemList));
+            mImageGroupList.add(new ImageGroup(0, imageItemList, imageTransition));
             // 默认第一个是选中的
             mCurImageGroup = mImageGroupList.get(0);
         } else {
             int leftBound = mImageGroupList.get(mImageGroupList.size() - 1).RIGHT_BOUND;
-            mImageGroupList.add(new ImageGroup(leftBound, imageItemList));
+            mImageGroupList.add(new ImageGroup(leftBound, imageItemList, imageTransition));
         }
     }
 
@@ -371,22 +390,22 @@ public class HorizontalThumbnailListView extends View {
         }
     }
 
-    public void replaceImageGroup(List<ImageItem> imageItemList, int position) {
-        if (imageItemList == null || imageItemList.size() == 0) {
-            Log.e(TAG, "Image item list can not be null or empty!");
-            return;
-        }
-
-        if (mImageGroupList.size() == 0) {
-            mImageGroupList.add(new ImageGroup(position, imageItemList));
-            // 默认第一个是选中的
-            mCurImageGroup = mImageGroupList.get(0);
-        } else {
-            int leftBound = mImageGroupList.get(position).LEFT_BOUND;
-            mImageGroupList.set(position, new ImageGroup(leftBound, imageItemList));
-        }
-        invalidate();
-    }
+//    public void replaceImageGroup(List<ImageItem> imageItemList, int position) {
+//        if (imageItemList == null || imageItemList.size() == 0) {
+//            Log.e(TAG, "Image item list can not be null or empty!");
+//            return;
+//        }
+//
+//        if (mImageGroupList.size() == 0) {
+//            mImageGroupList.add(new ImageGroup(position, imageItemList, imageTransition));
+//            // 默认第一个是选中的
+//            mCurImageGroup = mImageGroupList.get(0);
+//        } else {
+//            int leftBound = mImageGroupList.get(position).LEFT_BOUND;
+//            mImageGroupList.set(position, new ImageGroup(leftBound, imageItemList, imageTransition));
+//        }
+//        invalidate();
+//    }
 
     public void setImageGroupListener(ImageGroupListener listener) {
         mImageGroupListener = listener;
@@ -697,6 +716,12 @@ public class HorizontalThumbnailListView extends View {
         mScaleLinePaint.setStyle(Paint.Style.FILL);
         mScaleLinePaint.setStrokeWidth(5F);
 
+        mLinePaintTransition = new Paint();
+        mLinePaintTransition.setAntiAlias(true);
+        mLinePaintTransition.setColor(context.getResources().getColor(R.color.color_button_select));
+        mLinePaintTransition.setStyle(Paint.Style.FILL);
+        mLinePaintTransition.setStrokeWidth(3F);
+
         mTextPaint = new Paint();
         mTextPaint.setAntiAlias(true);
         mTextPaint.setColor(context.getResources().getColor(R.color.color_text_bottom));
@@ -763,7 +788,6 @@ public class HorizontalThumbnailListView extends View {
 
     public static class ImageItem {
         private int timeInHeader;
-        private String imageTransition;
         private Bitmap image;
 
         // The rectangular area drawn by the picture, the saved positions are all relative positions
@@ -868,6 +892,7 @@ public class HorizontalThumbnailListView extends View {
 
     public class ImageGroup {
         private final List<ImageItem> imageItemList = new ArrayList<>();
+        private final String imageTransition;
 
         private boolean isSelected;
 
@@ -884,11 +909,13 @@ public class HorizontalThumbnailListView extends View {
         /**
          * 构建image group
          *
-         * @param leftBound     左边边界值，绝对位置
-         * @param imageItemList image item列表
+         * @param leftBound       左边边界值，绝对位置
+         * @param imageItemList   image item列表
+         * @param imageTransition
          */
-        ImageGroup(int leftBound, List<ImageItem> imageItemList) {
+        ImageGroup(int leftBound, List<ImageItem> imageItemList, String imageTransition) {
             this.imageItemList.addAll(imageItemList);
+            this.imageTransition = imageTransition;
             LEFT_BOUND = leftBound;
             curLeftPos = leftBound;
             RIGHT_BOUND = leftBound + getWidth();
@@ -897,7 +924,8 @@ public class HorizontalThumbnailListView extends View {
             measuredRight = curRightPos;
         }
 
-        void drawImageInGroup(Canvas canvas, int basePos) {
+        void drawImageInGroup(Canvas canvas, int basePos, String imageTransition) {
+
             bottomSlideImageHeight = (mPaddingVerticalHeight) + mImageHeight;
             if (isSelected && mSelectedGroupBg != null) {
                 mSelectedGroupBg.setBounds(basePos - mGroupPaddingWidth,
@@ -910,6 +938,8 @@ public class HorizontalThumbnailListView extends View {
 
             measuredLeft = basePos;
             int curPos = basePos;
+
+
             for (ImageItem imageItem : imageItemList) {
                 mImageDstRect.set(
                         curPos,
@@ -920,16 +950,17 @@ public class HorizontalThumbnailListView extends View {
 //                Log.d(TAG, "Draw image item at: " + mImageDstRect);
                 canvas.drawBitmap(imageItem.image, imageItem.srcRect, mImageDstRect, null);
                 int totalSecs = imageItem.timeInHeader;
-//                Log.d(TAG, "Image group draw, index: " + mImageGroupList.indexOf(this) + ", totalSecs: " + totalSecs);
+                Log.d(TAG, "Image group draw, index: " + mImageGroupList.indexOf(this) + ", totalSecs: " + totalSecs);
 
-                if (imageItem.timeInHeader % 2 == 0) {
+                if ((imageItem.timeInHeader)% 2 == 0) {
                     canvas.drawText(convertTimeToString(totalSecs), mImageDstRect.left, mPaddingVerticalHeight + mTextPaint.getTextSize() / 1.5f, mTextPaint);
-                } else {
-
                 }
-                canvas.drawPoint(mImageDstRect.left, (mImageDstRect.top + mPaddingVerticalHeight + mTextPaint.getTextSize() / 1.5f) / 2, mScaleLinePaint);
+
+                canvas.drawCircle(mImageDstRect.left, (mImageDstRect.top + mPaddingVerticalHeight + mTextPaint.getTextSize() / 1.5f) / 2,4, mScaleLinePaint);
                 curPos += imageItem.getWidth();
             }
+
+
             measuredRight = curPos;
 
         }

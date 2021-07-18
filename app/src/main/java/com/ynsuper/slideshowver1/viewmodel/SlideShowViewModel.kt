@@ -265,6 +265,12 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
                     context.supportFragmentManager,
                     "scene-options"
                 )
+        }else {
+            Toast.makeText(
+                context,
+                context.getString(R.string.text_move_image_to_edit),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -282,6 +288,12 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
                 transitionAdapter.select(indexOf)
                 transitionViewLayout.getRecycleViewTransitions().smoothScrollToPosition(indexOf)
             }
+        } else {
+            Toast.makeText(
+                context,
+                context.getString(R.string.text_move_image_to_edit),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -739,11 +751,18 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
 //        binding.horizontalImageSlide!!.setSelectedGroupBg(context.resources.getDrawable(R.drawable.ic_select_bg))
         binding.horizontalImageSlide!!.setImageGroupListener(mImageGroupListener)
         var timeInHeader = 0
+        val sceneIndex = slideAdapter.selectedAt
+        var imageTransition : String? = null
+        if (sceneIndex >= 0) {
+            imageTransition = "image_transition/" + transitionAdapter.items[sceneIndex].imagePreview + ".png"
+        }else
+            imageTransition = "image_transition/" + transitionAdapter.items[0].imagePreview + ".png"
+
         for (i in videoComposer.getScenes().listIterator()) {
 //            val bitmap = BitmapFactory.decodeFile(mImagePathList!!.get(i))
             val bitmap: Bitmap = BitmapFactory.decodeFile(i.originalPath)
             val imageItemList: MutableList<HorizontalThumbnailListView.ImageItem> =
-                ArrayList<HorizontalThumbnailListView.ImageItem>()
+                ArrayList()
             var durationImage = (i.duration / 1000) - 1
 
             while (durationImage >= 0) {
@@ -753,46 +772,46 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
                         bitmap,
                         (imageSize).toInt(),
                         0,
-                        (imageSize).toInt(), timeInHeader.toInt()
-                    )
+                        (imageSize).toInt(), timeInHeader.toInt())
                 )
                 timeInHeader++
 
             }
 
-            binding.horizontalImageSlide!!.newImageGroup(imageItemList)
+            binding.horizontalImageSlide!!.newImageGroup(imageItemList, imageTransition)
         }
     }
 
-    fun changeDurationGroupImage(position: Int, time: Int) {
-        val imageSize: Int = DensityUtil.dip2px(context, 40F)
-        val screenWidth = context.windowManager.defaultDisplay.width
-        val groupPadding: Int = DensityUtil.dip2px(context, 16F)
-        var timeInHeader = 0
-
-//            val bitmap = BitmapFactory.decodeFile(mImagePathList!!.get(i))
-        val bitmap: Bitmap = videoComposer.getScenes().get(position).bitmap
-        val imageItemList: MutableList<HorizontalThumbnailListView.ImageItem> =
-            ArrayList<HorizontalThumbnailListView.ImageItem>()
-        var durationImage = time
-
-        while (durationImage >= 0) {
-            durationImage--
-            imageItemList.add(
-                HorizontalThumbnailListView.ImageItem(
-                    bitmap,
-                    (imageSize).toInt(),
-                    0,
-                    (imageSize).toInt(), timeInHeader.toInt()
-                )
-            )
-            timeInHeader++
-
-        }
-
-        binding.horizontalImageSlide!!.replaceImageGroup(imageItemList, position)
-
-    }
+//    fun changeDurationGroupImage(position: Int, time: Int) {
+//        val imageSize: Int = DensityUtil.dip2px(context, 40F)
+//        val screenWidth = context.windowManager.defaultDisplay.width
+//        val groupPadding: Int = DensityUtil.dip2px(context, 16F)
+//        var timeInHeader = 0
+//
+////            val bitmap = BitmapFactory.decodeFile(mImagePathList!!.get(i))
+//        val bitmap: Bitmap = videoComposer.getScenes().get(position).bitmap
+//        val imageItemList: MutableList<HorizontalThumbnailListView.ImageItem> =
+//            ArrayList<HorizontalThumbnailListView.ImageItem>()
+//        var durationImage = time
+//
+//        while (durationImage >= 0) {
+//            durationImage--
+//            imageItemList.add(
+//                HorizontalThumbnailListView.ImageItem(
+//                    bitmap,
+//                    (imageSize).toInt(),
+//                    0,
+//                    (imageSize).toInt(), timeInHeader.toInt(),
+//
+//                )
+//            )
+//            timeInHeader++
+//
+//        }
+//
+//        binding.horizontalImageSlide!!.replaceImageGroup(imageItemList, position)
+//
+//    }
 
 
     private val mImageGroupListener: ImageGroupListener =
