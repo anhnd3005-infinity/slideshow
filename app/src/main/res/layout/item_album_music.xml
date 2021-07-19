@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/btnAlbum"
-    android:background="@drawable/item_music_bg"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
@@ -26,7 +25,7 @@
         app:layout_constraintTop_toBottomOf="@+id/imgItemMusic"
         android:text="Hiphop"
         android:layout_marginTop="8dp"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="@color/color_main_dark"
         app:layout_constraintBottom_toTopOf="@id/txtSize"
@@ -36,9 +35,10 @@
     <TextView
         android:id="@+id/txtSize"
         android:text="6 tracks"
-        android:textSize="12sp"
+        android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@color/color_main_dark"
         app:layout_constraintTop_toBottomOf="@+id/txtMusicType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

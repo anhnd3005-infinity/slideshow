@@ -2,8 +2,8 @@ package com.ynsuper.slideshowver1.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.seanghay.studioexample.dao.SlideDao
-import com.seanghay.studioexample.dao.StoryDao
+import com.ynsuper.slideshowver1.dao.SlideDao
+import com.ynsuper.slideshowver1.dao.StoryDao
 import com.ynsuper.slideshowver1.dao.AudioDao
 import com.ynsuper.slideshowver1.util.entity.AudioEntity
 

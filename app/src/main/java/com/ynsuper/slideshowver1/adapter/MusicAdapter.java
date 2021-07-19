@@ -71,7 +71,7 @@ public class MusicAdapter extends BaseAdapter {
             ((TextView) viewProduct.findViewById(R.id.txt_artists)).setText(listAudio.get(position).getArtist());
 //            viewProduct.findViewById(R.id.btn_down_save).setVisibility(View.GONE);
             ProgressBar progressBar = viewProduct.findViewById(R.id.progress_download);
-            Glide.with(context).load(R.drawable.ic_checked).into(((ImageView) viewProduct.findViewById(R.id.btn_down_save)));
+            Glide.with(context).load(R.drawable.ic_check_circle_black_24dp).into(((ImageView) viewProduct.findViewById(R.id.btn_down_save)));
             ImageView imgDownUse = viewProduct.findViewById(R.id.btn_down_save);
             imgDownUse.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -114,7 +114,7 @@ public class MusicAdapter extends BaseAdapter {
                 Log.d("TESTADAPTER", "song name: " + song.getName() + " - " + fileNames.contains(fileName) + " txtSong: " + txtSongName.getText());
 
                 if(fileNames.contains(fileName) && txtSongName.getText().equals(song.getName())) {
-                    imgDownUse.setImageResource(R.drawable.ic_checked);
+                    imgDownUse.setImageResource(R.drawable.ic_check_circle_black_24dp);
                 }
             }
 

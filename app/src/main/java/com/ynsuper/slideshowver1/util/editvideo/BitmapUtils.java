@@ -35,6 +35,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory.Options;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.os.Build;
@@ -59,6 +60,17 @@ public class BitmapUtils {
     @SuppressWarnings("unused")
     private static final String TAG = "BitmapUtils";
 
+    private static final float PHOTO_BORDER_WIDTH = 2.0f;
+    private static final int PHOTO_BORDER_COLOR = 0xffffffff;
+    private static final Paint sPaint =
+            new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+    private static final Paint sStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    static {
+        sStrokePaint.setStrokeWidth(PHOTO_BORDER_WIDTH);
+        sStrokePaint.setStyle(Paint.Style.STROKE);
+        // sStrokePaint.measureText("hello");
+        sStrokePaint.setColor(PHOTO_BORDER_COLOR);
+    }
     public static final long MAX_SZIE = 1024 * 512;// 500KB
 
 //    public static Bitmap loadImageByPath(final String imagePath, int reqWidth,
@@ -446,6 +458,37 @@ public class BitmapUtils {
         return inSampleSize;
     }
 
+    public static Bitmap rotateAndFrame(Bitmap bitmap,float angle) {
+        // final boolean positive = sRandom.nextFloat() >= 0.5f;
+        // final float angle = (ROTATION_ANGLE_MIN + sRandom.nextFloat() *
+        //     ROTATION_ANGLE_EXTRA) * (positive ? 1.0f : -1.0f);
+        final double radAngle = Math.toRadians(angle);
+
+        final int bitmapWidth = bitmap.getWidth();
+        final int bitmapHeight = bitmap.getHeight();
+
+        final double cosAngle = Math.abs(Math.cos(radAngle));
+        final double sinAngle = Math.abs(Math.sin(radAngle));
+
+        final int strokedWidth = (int) (bitmapWidth + 2 * PHOTO_BORDER_WIDTH);
+        final int strokedHeight = (int) (bitmapHeight + 2 * PHOTO_BORDER_WIDTH);
+
+        final int width = (int) (strokedHeight * sinAngle + strokedWidth * cosAngle);
+        final int height = (int) (strokedWidth * sinAngle + strokedHeight * cosAngle);
+
+        final float x = (width - bitmapWidth) / 2.0f;
+        final float y = (height - bitmapHeight) / 2.0f;
+
+        final Bitmap decored = Bitmap.createBitmap(width, height,
+                Bitmap.Config.ARGB_8888);
+
+        final Canvas canvas = new Canvas(decored);
+
+        canvas.rotate(angle, width / 2.0f, height / 2.0f);
+        canvas.drawBitmap(bitmap, x, y, sPaint);
+        canvas.drawRect(x, y, x + bitmapWidth, y + bitmapHeight, sStrokePaint);
+        return decored;
+    }
     /**
      * 保存Bitmap图片到指定文件
      *

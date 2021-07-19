@@ -1,33 +1,24 @@
 package com.ynsuper.slideshowver1.viewmodel
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.view.View
-import android.view.Window
-import android.widget.TextView
-import androidx.core.app.ShareCompat
-import androidx.core.content.FileProvider
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
 import com.ynsuper.slideshowver1.MainActivity
-import com.ynsuper.slideshowver1.R
 import com.ynsuper.slideshowver1.base.BaseViewModel
 import com.ynsuper.slideshowver1.database.AppDatabase
 import com.ynsuper.slideshowver1.databinding.ActivityMainBinding
 import com.ynsuper.slideshowver1.model.ImageModel
 import com.ynsuper.slideshowver1.util.Constant
-import com.ynsuper.slideshowver1.util.entity.StoryEntity
+import com.ynsuper.slideshowver1.util.entity.SlideEntity
 import com.ynsuper.slideshowver1.view.SlideShowActivity
 import com.ynsuper.slideshowver1.view.activity.MyVideosActivity
 import com.ynsuper.slideshowver1.view.activity.ProActivity
 import com.ynsuper.slideshowver1.view.adapter.DraftListAdapter
-import com.ynsuper.slideshowver1.view.adapter.StoryListAdapter
 import gun0912.tedimagepicker.builder.TedImagePicker
 import java.io.File
 
@@ -36,6 +27,7 @@ class MainViewModel : BaseViewModel() {
     private lateinit var binding: ActivityMainBinding
     private val adapter: DraftListAdapter = DraftListAdapter()
     private var activity: MainActivity? = null
+    private var lastTime: Long = 0
 
     fun startImagePicker() {
         activity?.let { data ->
@@ -69,9 +61,19 @@ class MainViewModel : BaseViewModel() {
             Log.v(Constant.YNSUPER_TAG, "Permission is granted");
             //File write logic here
             loadDataDraftAndVideoSaved()
+            val arrImageModel = ArrayList<ImageModel>()
+            for (uri in adapter.items) {
+                val file = File(uri.path)
+                arrImageModel.add(ImageModel(Uri.fromFile(file)))
+            }
+
             adapter.onItemClicked = {
                 // handle draft
-
+                val intent = Intent(activity, SlideShowActivity::class.java)
+                intent.putParcelableArrayListExtra(
+                    Constant.EXTRA_ARRAY_IMAGE, arrImageModel
+                )
+                activity!!.startActivity(intent)
             }
 
 
@@ -82,29 +84,23 @@ class MainViewModel : BaseViewModel() {
 
 
     private fun loadDataDraftAndVideoSaved() {
-        loadDataVideoSaved()
-        loadDataDraft()
+        loadDataVideoDraft()
     }
 
-    private fun loadDataVideoSaved() {
+    fun loadDataVideoDraft() {
         appDatabase =
             Room.databaseBuilder(activity!!.baseContext, AppDatabase::class.java, "slideshow-v1")
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build()
         getAllFlow()
-        loadDataVideo()
-
-    }
-
-    private fun loadDataDraft() {
+        loadVideoDraft()
 
     }
 
 
-
-    private fun loadDataVideo() {
-        val layoutManager = GridLayoutManager(activity, 3)
+    private fun loadVideoDraft() {
+        val layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         binding.recycleMyDraft.layoutManager = layoutManager
         binding.recycleMyDraft.adapter = adapter
         binding.recycleMyDraft.setHasFixedSize(true)
@@ -115,14 +111,23 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun getAllFlow() {
+        val listFilter = ArrayList<SlideEntity>()
         if (appDatabase != null) {
 
-                adapter.patch(appDatabase?.slideDao()?.getAll()?.sortedByDescending { d -> d.createdAt }!!)
-                if (adapter.items.size > 0){
-                    binding.linearNoVideo.visibility = View.GONE
-                    binding.recycleMyDraft.visibility = View.VISIBLE
-                }
+            val fromDb = appDatabase!!.slideDao().getAll()
+            fromDb.filter { !File(it.path).exists() }.forEach(appDatabase!!.slideDao()::delete)
+
+
+            listFilter.addAll(fromDb.filter { File(it.path).exists() })
+
+
+            adapter.patch(listFilter)
+            if (adapter.items.size > 0) {
+                binding.linearNoVideo.visibility = View.GONE
+                binding.recycleMyDraft.visibility = View.VISIBLE
             }
+
+        }
     }
 
 

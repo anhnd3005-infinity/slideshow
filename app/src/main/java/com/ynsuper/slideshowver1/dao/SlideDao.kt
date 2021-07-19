@@ -1,4 +1,4 @@
-package com.seanghay.studioexample.dao
+package com.ynsuper.slideshowver1.dao
 
 import android.database.sqlite.SQLiteConstraintException
 import androidx.room.*

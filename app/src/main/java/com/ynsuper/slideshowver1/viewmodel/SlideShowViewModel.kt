@@ -221,17 +221,17 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
     }
 
     private fun initPhotos() {
-        if (slides.isEmpty()) {
-            val fromDb = appDatabase.slideDao().getAll()
-            fromDb.filter { !File(it.path).exists() }.forEach(appDatabase.slideDao()::delete)
-            slides.addAll(fromDb.filter { File(it.path).exists() })
-        }
+//        if (slides.isEmpty()) {
+//            val fromDb = appDatabase.slideDao().getAll()
+//            fromDb.filter { !File(it.path).exists() }.forEach(appDatabase.slideDao()::delete)
+//            slides.addAll(fromDb.filter { File(it.path).exists() })
+//        }
 
-        binding.recyclerView.let {
-            it.adapter = slideAdapter
-            it.setHasFixedSize(true)
-            (it.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        }
+//        binding.recyclerView.let {
+//            it.adapter = slideAdapter
+//            it.setHasFixedSize(true)
+//            (it.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+//        }
 
 //        dispatchUpdates()
 
@@ -418,14 +418,21 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
                 transitionViewLayout.getRecycleViewTransitions()
                     .smoothScrollToPosition(transitionAdapter.selectedAt)
             }
-
+            binding.horizontalImageSlide.replaceImageTransition(slideAdapter.selectedAt,
+                "image_transition/" + transition.imagePreview + ".png")
+//            loadHorizonSlideImage()
             dispatchDraw()
         }
 
         transitionAdapter.onLongPressed = {
             val transition = transitions[transitionAdapter.selectedAt]
+            var index = 0
             videoComposer.getScenes().forEach {
                 it.transition = transition
+                binding.horizontalImageSlide.replaceImageTransition(index,
+                    "image_transition/" + transition.imagePreview + ".png")
+                index++
+
             }
             Toast.makeText(context, "Applied transitions for all slides", Toast.LENGTH_SHORT).show()
             dispatchDraw()
@@ -748,7 +755,7 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
         binding.horizontalImageSlide!!.setEndPaddingWidth(screenWidth / 2 - groupPadding)
         binding.horizontalImageSlide!!.setGroupPaddingWidth(groupPadding)
         binding.horizontalImageSlide!!.setPaddingVerticalHeight(DensityUtil.dip2px(context, 2F))
-//        binding.horizontalImageSlide!!.setSelectedGroupBg(context.resources.getDrawable(R.drawable.ic_select_bg))
+        binding.horizontalImageSlide!!.setSelectedGroupBg(context.resources.getDrawable(R.drawable.round_button_select_slides))
         binding.horizontalImageSlide!!.setImageGroupListener(mImageGroupListener)
         var timeInHeader = 0
         val sceneIndex = slideAdapter.selectedAt

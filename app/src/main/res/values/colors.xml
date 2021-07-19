@@ -14,16 +14,16 @@
     <color name="red_e73a3d">#e73a3d</color>
     <color name="colorPrimary">#23374d</color>
     <color name="colorPrimaryDark">#23374d</color>
-    <color name="colorAccent">#9c1bbb</color>
+    <color name="colorAccent">#e55ae9</color>
     <color name="color_main_edit">#131416</color>
     <color name="color_main1">#fcb045</color>
-    <color name="color_main2">#9c1bbb</color>
+    <color name="color_main2">#e55ae9</color>
     <color name="color_main_dark">#ffffff</color>
     <color name="color_download">#17B537</color>
     <color name="grey">#a2a4b5</color>
     <color name="color_text_bottom">#87888a</color>
     <color name="color_item_bottom">#ffffff</color>
-    <color name="color_button_select">#9c1bbb</color>
+    <color name="color_button_select">#e55ae9</color>
 
 
 
@@ -79,4 +79,5 @@
     <color name="colorBackground48">#795548</color>
     <color name="colorBackground49">#9E9E9E</color>
     <color name="colorBackground50">#607D8B</color>
+    <color name="color_white">#ffffff</color>
 </resources>

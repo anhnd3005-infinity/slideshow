@@ -19,7 +19,7 @@ import com.ynsuper.slideshowver1.model.MusicModel
 import com.ynsuper.slideshowver1.util.Constant
 import com.ynsuper.slideshowver1.util.Constants
 import com.ynsuper.slideshowver1.view.SlideShowActivity
-import com.ynsuper.slideshowver1.view.adapter.ViewPagerAdapter
+import com.ynsuper.slideshowver1.view.adapter.MusicViewPagerAdapter
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -43,7 +43,7 @@ import java.net.URLConnection
 class MusicViewLayout : BaseCustomConstraintLayout, MusicAdapter.OnSongClickListener {
     private lateinit var onSelectedSongListener: OnSelectedSongListener
     private var categoryListMusic: AlbumMusicModel? = null
-    private lateinit var viewPagerAdapter: ViewPagerAdapter
+    private lateinit var musicViewPagerAdapter: MusicViewPagerAdapter
     private lateinit var topbarController: TopBarController
 
     constructor(context: Context?) : super(context) {
@@ -73,13 +73,13 @@ class MusicViewLayout : BaseCustomConstraintLayout, MusicAdapter.OnSongClickList
     }
 
     private fun initView() {
-        viewPagerAdapter = ViewPagerAdapter(
+        musicViewPagerAdapter = MusicViewPagerAdapter(
             (context as SlideShowActivity).supportFragmentManager,
             this
         )
-        viewpager.adapter = viewPagerAdapter
+        viewpager.adapter = musicViewPagerAdapter
         tab_layout_music.setupWithViewPager(viewpager)
-        categoryListMusic?.let { viewPagerAdapter.setCategoryList(it) }
+        categoryListMusic?.let { musicViewPagerAdapter.setCategoryList(it) }
         image_close_menu.visibility = View.VISIBLE
         image_close_menu.setOnClickListener {
             SoundManager.getInstance(context).stopSound()
@@ -153,7 +153,7 @@ class MusicViewLayout : BaseCustomConstraintLayout, MusicAdapter.OnSongClickList
                     Log.d(Constant.NDPHH_TAG, "downloadZipFile onComplete ")
                     progressBar.visibility = GONE
                     imgDownUse.visibility = VISIBLE
-                    imgDownUse.setImageResource(R.drawable.ic_checked)
+                    imgDownUse.setImageResource(R.drawable.ic_check_circle_black_24dp)
                 }
             )
 
@@ -180,7 +180,7 @@ class MusicViewLayout : BaseCustomConstraintLayout, MusicAdapter.OnSongClickList
 
     fun setCategoryListModel(it: AlbumMusicModel) {
         this.categoryListMusic = it
-        viewPagerAdapter?.setCategoryList(it)
+        musicViewPagerAdapter?.setCategoryList(it)
     }
 
     fun changeImageCloseToBack() {

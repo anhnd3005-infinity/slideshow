@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ynsuper.slideshowver1.R
 import com.ynsuper.slideshowver1.util.entity.SlideEntity
-import com.ynsuper.slideshowver1.util.entity.StoryEntity
 import kotlinx.android.synthetic.main.item_video.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -98,29 +97,14 @@ class DraftListAdapter(
         }
 
         fun bind(item: SlideEntity) {
+
             val relativeTime = DateUtils.getRelativeTimeSpanString(item.createdAt).toString()
-//            retriver.setDataSource(item.path)
-//            val duration = item.duration
             itemView.title.text = relativeTime
-//            itemView.title.text = SpannableStringBuilder(item.title)
-//                .append(" \n")
-//                .scale(.8f) {
-//                    color(Color.parseColor("#3a3a3a")) {
-//                        append(relativeTime)
-//                    }
-//                }
-
-//            itemView.subtitle.text = formatDuration(duration)
-//            itemView.subtitle.setText(
-//                SpannableStringBuilder(formatDate(item.createdAt) + " \n")
-//                    .color(Color.BLACK) { append(formatDuration(duration)) }
-//            )
-
-
             Glide.with(itemView)
                 .load(item.path)
                 .centerCrop()
                 .into(itemView.thumbnail)
+
 
         }
 

@@ -9,7 +9,7 @@ import com.ynsuper.slideshowver1.view.fragment.FragmentAlbumMusic
 import com.ynsuper.slideshowver1.view.fragment.FragmentAlbumMusic.Companion.newInstance
 import com.ynsuper.slideshowver1.view.fragment.FragmentMyMusic
 
-class ViewPagerAdapter(fm: FragmentManager?, private var onSongClickListener: MusicAdapter.OnSongClickListener) :
+class MusicViewPagerAdapter(fm: FragmentManager?, private var onSongClickListener: MusicAdapter.OnSongClickListener) :
     FragmentPagerAdapter(fm!!) {
     private var fragmentManager = fm
     private val fragmentAlbumMusic: FragmentAlbumMusic? = null
@@ -46,6 +46,7 @@ class ViewPagerAdapter(fm: FragmentManager?, private var onSongClickListener: Mu
         return title
     }
 
+    
     fun setCategoryList(it: AlbumMusicModel) {
         (getItem(0) as FragmentAlbumMusic).viewModel?.categoryMusicList = it
         newInstance(fragmentManager!!, onSongClickListener).categoryMusicList = it

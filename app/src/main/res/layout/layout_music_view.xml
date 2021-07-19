@@ -35,6 +35,7 @@
                 android:background="@color/color_main_edit"
                 app:layout_constraintTop_toBottomOf="@+id/layout_top_bar"
                 app:tabIndicatorColor="@color/white"
+                app:tabTextColor="@color/white"
                 app:tabSelectedTextColor="@color/white" />
         </LinearLayout>
 

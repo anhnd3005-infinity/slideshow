@@ -12,7 +12,6 @@
         android:id="@+id/image_music_logo"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:background="@drawable/item_music_bg"
         android:src="@drawable/ic_icons8_music"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toStartOf="parent"

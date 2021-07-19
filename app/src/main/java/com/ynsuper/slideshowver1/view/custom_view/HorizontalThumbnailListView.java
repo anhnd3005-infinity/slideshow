@@ -162,6 +162,7 @@ public class HorizontalThumbnailListView extends View {
         drawImageGroup(canvas);
 //        drawImageUtility(canvas);
 
+
         invalidate();
     }
 
@@ -190,30 +191,44 @@ public class HorizontalThumbnailListView extends View {
         mPaint.setColor(mPaddingColor);
         curPos += mPaddingStartWidth;
         curPos += mGroupPaddingWidth;
-        for (ImageGroup imageGroup : mImageGroupList) {
+        for (int i = 0; i < mImageGroupList.size(); i++) {
+            ImageGroup imageGroup = mImageGroupList.get(i);
 //            Log.d(TAG, "onDraw: " + imageGroup);
             if (imageGroup.isHidden) {
 //                Log.d(TAG, "Image group hidden, so skip this!");
                 continue;
             }
+
             imageGroup.drawImageInGroup(canvas, curPos, imageGroup.imageTransition);
             // draw transition
-            Bitmap bitmapTransition = BitmapUtils.resizeBitmap(BitmapUtils.getBitmapFromAsset(getContext(), imageGroup.imageTransition),
-                    100, 100);
-            if (bitmapTransition != null) {
-                canvas.drawLine(mImageDstRect.right + mPaddingVerticalHeight * 2 - mLinePaintTransition.getStrokeWidth() / 2,
-                        (mImageDstRect.top) * 2 - 2,
-                        mImageDstRect.right + mPaddingVerticalHeight * 2 - mLinePaintTransition.getStrokeWidth() / 2,
-                        mImageDstRect.bottom + mPaddingVerticalHeight * 3, mLinePaintTransition
-                );
-                canvas.drawCircle(mImageDstRect.right + mPaddingVerticalHeight * 2- mLinePaintTransition.getStrokeWidth()/2,
-                        (mImageDstRect.top) * 2, 8, mLinePaintTransition);
-                canvas.drawBitmap(bitmapTransition,
-                        mImageDstRect.right - bitmapTransition.getWidth() / 2 + mPaddingVerticalHeight * 2,
-                        mImageDstRect.bottom + mPaddingVerticalHeight * 3, null);
-            }
+            if (i != mImageGroupList.size() - 1) {
+                Bitmap bitmapTransition = BitmapUtils.getBitmapFromAsset(getContext(), imageGroup.imageTransition);
+                if (bitmapTransition != null) {
+                    Bitmap bitmapTransitionResize = BitmapUtils.resizeBitmap(bitmapTransition, 80, 80);
 
+                    canvas.drawLine(mImageDstRect.right + mPaddingVerticalHeight * 2 - mLinePaintTransition.getStrokeWidth() / 2,
+                            (mImageDstRect.top) * 2 - 2,
+                            mImageDstRect.right + mPaddingVerticalHeight * 2 - mLinePaintTransition.getStrokeWidth() / 2,
+                            mImageDstRect.bottom + mPaddingVerticalHeight * 3, mLinePaintTransition
+                    );
+                    canvas.drawCircle(mImageDstRect.right + mPaddingVerticalHeight * 2 - mLinePaintTransition.getStrokeWidth() / 2,
+                            (mImageDstRect.top) * 2, 8, mLinePaintTransition);
+                    canvas.drawBitmap(BitmapUtils.rotateAndFrame(bitmapTransitionResize, 0),
+                            mImageDstRect.right - bitmapTransitionResize.getWidth() / 2 + mPaddingVerticalHeight * 2,
+                            mImageDstRect.bottom + mPaddingVerticalHeight * 3, null);
+                }
+            }
             curPos += imageGroup.getWidth() + mGroupPaddingWidth;
+
+
+        }
+        if (!mImageGroupList.isEmpty()) {
+            ImageGroup indexLastGroup = mImageGroupList.get(mImageGroupList.size() - 1);
+            int totalTime = indexLastGroup.imageItemList.get(indexLastGroup.imageItemList.size() - 1).timeInHeader;
+            canvas.drawText(convertTimeToString(totalTime + 1), mImageDstRect.right,
+                    mPaddingVerticalHeight + mTextPaint.getTextSize() / 1.5f, mTextPaint);
+            canvas.drawCircle(mImageDstRect.right, (mImageDstRect.top + mPaddingVerticalHeight + mTextPaint.getTextSize() / 1.5f) / 2, 4, mScaleLinePaint);
+
         }
 
 
@@ -390,22 +405,29 @@ public class HorizontalThumbnailListView extends View {
         }
     }
 
-//    public void replaceImageGroup(List<ImageItem> imageItemList, int position) {
-//        if (imageItemList == null || imageItemList.size() == 0) {
-//            Log.e(TAG, "Image item list can not be null or empty!");
-//            return;
-//        }
-//
-//        if (mImageGroupList.size() == 0) {
-//            mImageGroupList.add(new ImageGroup(position, imageItemList, imageTransition));
-//            // 默认第一个是选中的
-//            mCurImageGroup = mImageGroupList.get(0);
-//        } else {
-//            int leftBound = mImageGroupList.get(position).LEFT_BOUND;
-//            mImageGroupList.set(position, new ImageGroup(leftBound, imageItemList, imageTransition));
-//        }
-//        invalidate();
-//    }
+    public void replaceImageGroup(List<ImageItem> imageItemList, int position, String imageTransition) {
+        if (imageItemList == null || imageItemList.size() == 0) {
+            Log.e(TAG, "Image item list can not be null or empty!");
+            return;
+        }
+
+        if (mImageGroupList.size() == 0) {
+            mImageGroupList.add(new ImageGroup(position, imageItemList, imageTransition));
+            // 默认第一个是选中的
+            mCurImageGroup = mImageGroupList.get(0);
+        } else {
+            int leftBound = mImageGroupList.get(position).LEFT_BOUND;
+            mImageGroupList.set(position, new ImageGroup(leftBound, imageItemList, imageTransition));
+        }
+        invalidate();
+    }
+
+    public void replaceImageTransition(int position, String imageTransition) {
+
+        int leftBound = mImageGroupList.get(position).LEFT_BOUND;
+        mImageGroupList.set(position, new ImageGroup(leftBound, mImageGroupList.get(position).imageItemList, imageTransition));
+        invalidate();
+    }
 
     public void setImageGroupListener(ImageGroupListener listener) {
         mImageGroupListener = listener;
@@ -712,19 +734,19 @@ public class HorizontalThumbnailListView extends View {
 
         mScaleLinePaint = new Paint();
         mScaleLinePaint.setAntiAlias(true);
-        mScaleLinePaint.setColor(context.getResources().getColor(R.color.color_text_bottom));
+        mScaleLinePaint.setColor(context.getResources().getColor(R.color.color_white));
         mScaleLinePaint.setStyle(Paint.Style.FILL);
         mScaleLinePaint.setStrokeWidth(5F);
 
         mLinePaintTransition = new Paint();
         mLinePaintTransition.setAntiAlias(true);
-        mLinePaintTransition.setColor(context.getResources().getColor(R.color.color_button_select));
+        mLinePaintTransition.setColor(context.getResources().getColor(R.color.color_white));
         mLinePaintTransition.setStyle(Paint.Style.FILL);
-        mLinePaintTransition.setStrokeWidth(3F);
+        mLinePaintTransition.setStrokeWidth(2F);
 
         mTextPaint = new Paint();
         mTextPaint.setAntiAlias(true);
-        mTextPaint.setColor(context.getResources().getColor(R.color.color_text_bottom));
+        mTextPaint.setColor(context.getResources().getColor(R.color.color_white));
         mTextPaint.setStyle(Paint.Style.FILL);
         mTextPaint.setTextAlign(Paint.Align.CENTER);
         mTextPaint.setTextSize(25f);
@@ -950,16 +972,15 @@ public class HorizontalThumbnailListView extends View {
 //                Log.d(TAG, "Draw image item at: " + mImageDstRect);
                 canvas.drawBitmap(imageItem.image, imageItem.srcRect, mImageDstRect, null);
                 int totalSecs = imageItem.timeInHeader;
-                Log.d(TAG, "Image group draw, index: " + mImageGroupList.indexOf(this) + ", totalSecs: " + totalSecs);
+//                Log.d(TAG, "Image group draw, index: " + mImageGroupList.indexOf(this) + ", totalSecs: " + totalSecs);
 
-                if ((imageItem.timeInHeader)% 2 == 0) {
+                if ((imageItem.timeInHeader) % 2 == 0) {
                     canvas.drawText(convertTimeToString(totalSecs), mImageDstRect.left, mPaddingVerticalHeight + mTextPaint.getTextSize() / 1.5f, mTextPaint);
                 }
 
-                canvas.drawCircle(mImageDstRect.left, (mImageDstRect.top + mPaddingVerticalHeight + mTextPaint.getTextSize() / 1.5f) / 2,4, mScaleLinePaint);
+                canvas.drawCircle(mImageDstRect.left, (mImageDstRect.top + mPaddingVerticalHeight + mTextPaint.getTextSize() / 1.5f) / 2, 4, mScaleLinePaint);
                 curPos += imageItem.getWidth();
             }
-
 
             measuredRight = curPos;
 

@@ -1,4 +1,4 @@
-package com.seanghay.studioexample.dao
+package com.ynsuper.slideshowver1.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
