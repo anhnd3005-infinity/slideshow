@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.net.Uri
+import android.os.Handler
 import android.util.Log
 import android.util.Size
 import android.util.SparseArray
@@ -27,7 +28,6 @@ import com.ynsuper.slideshowver1.R
 import com.ynsuper.slideshowver1.adapter.SoundManager
 import com.ynsuper.slideshowver1.base.BaseViewModel
 import com.ynsuper.slideshowver1.bottomsheet.AddImageGroupBottomSheet
-import com.ynsuper.slideshowver1.bottomsheet.DurationOptionsBottomSheet
 import com.ynsuper.slideshowver1.bottomsheet.SaveVideoBottomSheet
 import com.ynsuper.slideshowver1.bottomsheet.StickerBottomSheet
 import com.ynsuper.slideshowver1.callback.*
@@ -47,10 +47,8 @@ import com.ynsuper.slideshowver1.view.StickerView
 import com.ynsuper.slideshowver1.view.adapter.SlideAdapter
 import com.ynsuper.slideshowver1.view.adapter.TransitionsAdapter
 import com.ynsuper.slideshowver1.view.custom_view.HorizontalThumbnailListView
-import com.ynsuper.slideshowver1.view.menu.BackgroundOptionsViewLayout
-import com.ynsuper.slideshowver1.view.menu.MusicViewLayout
-import com.ynsuper.slideshowver1.view.menu.RatioViewLayout
-import com.ynsuper.slideshowver1.view.menu.TransitionViewLayout
+import com.ynsuper.slideshowver1.view.menu.*
+import com.ynsuper.slideshowver1.view.menu.BackgroundOptionsViewLayout.OptionState
 import com.ynsuper.slideshowver1.view.sticker.QuoteState
 import gun0912.tedimagepicker.builder.TedImagePicker
 import id.zelory.compressor.Compressor
@@ -70,12 +68,15 @@ import kotlin.collections.ArrayList
 
 class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListChange {
 
+
+    private var lastIndex: Int = 0
     private lateinit var onSelectedSongListener: MusicViewLayout.OnSelectedSongListener
     private var arrListSticker: ListSticker? = null
     private var totalDuration: Long = 0
     private var isPlay = false
     private var startScroll: Int = 0
     private var timer: Timer? = null
+    private lateinit var durationViewLayout: DurationViewLayout
     private lateinit var musicViewLayout: MusicViewLayout
     private lateinit var ratioViewLayout: RatioViewLayout
     private lateinit var transitionViewLayout: TransitionViewLayout
@@ -154,6 +155,9 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
 
         musicViewLayout = context.findViewById(R.id.music_view_layout)
         musicViewLayout.setTopbarController(this)
+
+        durationViewLayout = context.findViewById(R.id.duration_view_layout)
+        durationViewLayout.setTopbarController(this)
     }
 
 
@@ -253,25 +257,24 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
         if (sceneIndex >= 0) {
             val scene = videoComposer.getScenes()[sceneIndex]
 
-            val state = DurationOptionsBottomSheet.OptionState(
+            val state = DurationViewLayout.OptionState(
                 id = scene.id,
                 duration = scene.duration,
                 crop = scene.cropType.key()
             )
 
-            DurationOptionsBottomSheet
-                .newInstance(state)
-                .show(
-                    context.supportFragmentManager,
-                    "scene-options"
-                )
-        }else {
+            durationViewLayout.visibility = View.VISIBLE
+            durationViewLayout.setState(state)
+            hideMenuBar()
+        } else {
             Toast.makeText(
                 context,
                 context.getString(R.string.text_move_image_to_edit),
                 Toast.LENGTH_SHORT
             ).show()
         }
+
+
     }
 
     private fun selectionScene() {
@@ -418,8 +421,10 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
                 transitionViewLayout.getRecycleViewTransitions()
                     .smoothScrollToPosition(transitionAdapter.selectedAt)
             }
-            binding.horizontalImageSlide.replaceImageTransition(slideAdapter.selectedAt,
-                "image_transition/" + transition.imagePreview + ".png")
+            binding.horizontalImageSlide.replaceImageTransition(
+                slideAdapter.selectedAt,
+                "image_transition/" + transition.imagePreview + ".png"
+            )
 //            loadHorizonSlideImage()
             dispatchDraw()
         }
@@ -429,8 +434,10 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
             var index = 0
             videoComposer.getScenes().forEach {
                 it.transition = transition
-                binding.horizontalImageSlide.replaceImageTransition(index,
-                    "image_transition/" + transition.imagePreview + ".png")
+                binding.horizontalImageSlide.replaceImageTransition(
+                    index,
+                    "image_transition/" + transition.imagePreview + ".png"
+                )
                 index++
 
             }
@@ -500,7 +507,7 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
                         .setCompressFormat(Bitmap.CompressFormat.JPEG)
                         .compressToFile(file, "photos-${UUID.randomUUID()}.jpg")
                     SlideEntity(
-                        createdAt =  System.currentTimeMillis(),
+                        createdAt = System.currentTimeMillis(),
                         path = compressedFile.path
                     )
                 }
@@ -561,7 +568,7 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
         if (sceneIndex >= 0) {
             val scene = videoComposer.getScenes()[sceneIndex]
 
-            val state = BackgroundOptionsViewLayout.OptionState(
+            val state = OptionState(
                 id = scene.id,
                 blur = scene.isBlur,
                 color = scene.currentColor,
@@ -644,7 +651,14 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
         }
         if (musicViewLayout.visibility == View.VISIBLE) {
             musicViewLayout.visibility = View.GONE
+            showMenuBar()
+
         }
+        if (durationViewLayout.visibility == View.VISIBLE) {
+            durationViewLayout.visibility = View.GONE
+            showMenuBar()
+        }
+
     }
 
     private fun applyMusicToView(currentUrl: String?) {
@@ -759,10 +773,11 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
         binding.horizontalImageSlide!!.setImageGroupListener(mImageGroupListener)
         var timeInHeader = 0
         val sceneIndex = slideAdapter.selectedAt
-        var imageTransition : String? = null
+        var imageTransition: String? = null
         if (sceneIndex >= 0) {
-            imageTransition = "image_transition/" + transitionAdapter.items[sceneIndex].imagePreview + ".png"
-        }else
+            imageTransition =
+                "image_transition/" + transitionAdapter.items[sceneIndex].imagePreview + ".png"
+        } else
             imageTransition = "image_transition/" + transitionAdapter.items[0].imagePreview + ".png"
 
         for (i in videoComposer.getScenes().listIterator()) {
@@ -779,7 +794,8 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
                         bitmap,
                         (imageSize).toInt(),
                         0,
-                        (imageSize).toInt(), timeInHeader.toInt())
+                        (imageSize).toInt(), timeInHeader.toInt()
+                    )
                 )
                 timeInHeader++
 
@@ -860,7 +876,7 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
             }
         }
 
-    fun onStateChange(state: BackgroundOptionsViewLayout.OptionState) {
+    fun onStateChange(state: OptionState) {
 
         videoComposer.updateSceneCropType(
             state.id, state.blur,
@@ -888,10 +904,28 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
 
     override fun onItemListChange(index: Int) {
         Log.d("YnsuperTAG", "imageGroup.isSelected: " + index)
+
+
+
+        if (lastIndex != index && durationViewLayout.visibility == View.VISIBLE) {
+            Handler().post(Runnable {
+                val scene = videoComposer.getScenes()[index]
+
+                val state = DurationViewLayout.OptionState(
+                    id = scene.id,
+                    duration = scene.duration,
+                    crop = scene.cropType.key()
+                )
+                durationViewLayout.setState(state)
+            })
+        }
+
+        lastIndex = index
         slideAdapter?.select(index)
+
     }
 
-    fun onDurationChange(state: DurationOptionsBottomSheet.OptionState) {
+    fun onDurationChange(state: DurationViewLayout.OptionState) {
         val scene = videoComposer.getScenes().find { it.id == state.id } ?: return
         scene.duration = state.duration
         state.id
@@ -931,7 +965,7 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
 
     }
 
-    fun onBackgroundConfigChage(state: BackgroundOptionsViewLayout.OptionState) {
+    fun onBackgroundConfigChage(state: OptionState) {
         onStateChange(state)
 
     }

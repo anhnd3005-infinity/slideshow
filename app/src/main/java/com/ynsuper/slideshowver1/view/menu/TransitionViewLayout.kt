@@ -46,7 +46,7 @@ class TransitionViewLayout : BaseCustomConstraintLayout {
         text_name_top_bar.text = name
     }
     private fun initView() {
-        setTopBarName("Transition")
+        setTopBarName(context.getString(R.string.text_transition))
         image_submit_menu.setOnClickListener {
             topBarController.clickSubmitTopBar()
         }

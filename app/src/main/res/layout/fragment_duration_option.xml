@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="150dp"
+    android:background="@color/color_main_edit"
     android:orientation="vertical">
 
     <include
@@ -16,8 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:text="00:00"
-        android:textColor="?colorOnSurface"
-
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="@+id/seekBarDuration"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/seekBarDuration" />
@@ -28,10 +28,10 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:padding="16dp"
-        android:thumb="@null"
         android:progress="20"
         android:thumbOffset="2dp"
-        android:progressDrawable="@drawable/progress_color"
+        android:backgroundTint="@color/color_text_bottom"
+        android:progressBackgroundTint="@color/color_text_bottom"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/duration"
         app:layout_constraintStart_toStartOf="parent"

@@ -1,57 +1,50 @@
-package com.ynsuper.slideshowver1.bottomsheet
+package com.ynsuper.slideshowver1.view.menu
 
 import android.content.Context
-import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.AttributeSet
 import android.widget.SeekBar
 import androidx.annotation.FloatRange
-import androidx.annotation.IdRes
-import androidx.core.os.bundleOf
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.ynsuper.slideshowver1.R
+import com.ynsuper.slideshowver1.base.BaseCustomConstraintLayout
 import com.ynsuper.slideshowver1.callback.SceneOptionStateListener
-import kotlinx.android.synthetic.main.fragment_duration_option.*
-import kotlinx.android.synthetic.main.item_layout_edit_top_view.*
+import com.ynsuper.slideshowver1.callback.TopBarController
+import com.ynsuper.slideshowver1.view.SlideShowActivity
+import kotlinx.android.synthetic.main.fragment_duration_option.view.*
+import kotlinx.android.synthetic.main.item_layout_edit_top_view.view.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
-class DurationOptionsBottomSheet : BottomSheetDialogFragment() {
-
+class DurationViewLayout : BaseCustomConstraintLayout {
+    private lateinit var topBarController: TopBarController
     private var state: OptionState? = null
     private var listener: SceneOptionStateListener? = null
+    private val MAX_DURATION = 20 * 1000L // 10 seconds
+    private val MIN_DURATION = 2 * 1000L // 2 seconds
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is SceneOptionStateListener)
-            listener = context
+    constructor(context: Context?) : super(context) {
+        setLayoutInflate(R.layout.fragment_duration_option)
+        initView()
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        listener = null
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+        setLayoutInflate(R.layout.fragment_duration_option)
+        initView()
     }
 
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        state =
-            arguments?.getParcelable("state") ?: throw RuntimeException("There is no initial state")
-        return inflater.inflate(R.layout.fragment_duration_option, container, false)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        setLayoutInflate(R.layout.fragment_duration_option)
+        initView()
     }
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setState()
+    private fun initView() {
         updateDuration()
-
+        setTopBarName(context.getString(R.string.text_duration))
         seekBarDuration.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 updateDuration()
@@ -67,10 +60,13 @@ class DurationOptionsBottomSheet : BottomSheetDialogFragment() {
         })
 
         image_submit_menu.setOnClickListener {
-            saveState()
-            dismiss()
+            topBarController.clickSubmitTopBar()
         }
+    }
 
+
+    fun setTopbarController(topbarController: TopBarController) {
+        this.topBarController = topbarController
     }
 
 
@@ -78,26 +74,15 @@ class DurationOptionsBottomSheet : BottomSheetDialogFragment() {
         this.state?.let {
             listener?.onDurationChange(this.state!!)
         }
-        dismiss()
+
     }
 
     private fun setState() {
+        listener = context as SlideShowActivity
+
         state?.let { s ->
             seekBarDuration.progress = calcProgress(s.duration)
 
-        }
-    }
-
-    @IdRes
-    private fun getCheckedId(key: String): Int {
-        return when (key) {
-            "fit-center" -> R.id.fitCenter
-            "fit-end" -> R.id.fitEnd
-            "fit-start" -> R.id.fitStart
-            "fill-center" -> R.id.fillCenter
-            "fill-end" -> R.id.fillEnd
-            "fill-start" -> R.id.fillStart
-            else -> R.id.fitCenter
         }
     }
 
@@ -107,6 +92,8 @@ class DurationOptionsBottomSheet : BottomSheetDialogFragment() {
             calculateDuration(seekBarDuration.progress.toFloat() / seekBarDuration.max.toFloat())
         duration.text = formatDuration(d)
         this.state?.duration = d
+        saveState()
+
     }
 
 
@@ -122,29 +109,24 @@ class DurationOptionsBottomSheet : BottomSheetDialogFragment() {
         )
     }
 
-    companion object {
-
-        private const val MAX_DURATION = 20 * 1000L // 10 seconds
-        private const val MIN_DURATION = 2 * 1000L // 2 seconds
-
-        fun calculateDuration(@FloatRange(from = 0.0, to = 1.0) progress: Float): Long {
-            return max((MAX_DURATION * progress).toLong(), MIN_DURATION)
-        }
-
-        fun calcProgress(duration: Long): Int {
-            val delta = MAX_DURATION - MIN_DURATION
-            return ((duration.toFloat() / delta.toFloat()) * 100f).toInt()
-        }
-
-
-        @JvmStatic
-        fun newInstance(state: OptionState): DurationOptionsBottomSheet {
-            return DurationOptionsBottomSheet().apply {
-                arguments = bundleOf("state" to state)
-            }
-        }
+    fun calculateDuration(@FloatRange(from = 0.0, to = 1.0) progress: Float): Long {
+        return max((MAX_DURATION * progress).toLong(), MIN_DURATION)
     }
 
+    fun calcProgress(duration: Long): Int {
+        val delta = MAX_DURATION - MIN_DURATION
+        return ((duration.toFloat() / delta.toFloat()) * 100f).toInt()
+    }
+
+    fun setState(state: OptionState) {
+        this.state = state
+        setState()
+        initView()
+    }
+
+    fun setTopBarName(name: String) {
+        text_name_top_bar.text = name
+    }
 
 
     data class OptionState(

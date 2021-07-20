@@ -13,7 +13,6 @@ import com.ynsuper.slideshowver1.R
 import com.ynsuper.slideshowver1.adapter.MusicAdapter
 import com.ynsuper.slideshowver1.adapter.SoundManager
 import com.ynsuper.slideshowver1.base.BaseActivity
-import com.ynsuper.slideshowver1.bottomsheet.DurationOptionsBottomSheet
 import com.ynsuper.slideshowver1.callback.SaveStateListener
 import com.ynsuper.slideshowver1.callback.SceneOptionStateListener
 import com.ynsuper.slideshowver1.databinding.ActivitySlideshowBinding
@@ -21,6 +20,7 @@ import com.ynsuper.slideshowver1.model.ImageModel
 import com.ynsuper.slideshowver1.util.Constant
 import com.ynsuper.slideshowver1.util.entity.AudioEntity
 import com.ynsuper.slideshowver1.view.menu.BackgroundOptionsViewLayout
+import com.ynsuper.slideshowver1.view.menu.DurationViewLayout
 import com.ynsuper.slideshowver1.view.menu.MusicViewLayout
 import com.ynsuper.slideshowver1.viewmodel.SlideShowViewModel
 import kotlinx.android.synthetic.main.activity_slideshow.*
@@ -79,6 +79,7 @@ class SlideShowActivity : BaseActivity(), SceneOptionStateListener,
         image_add_image.setOnClickListener { viewModel.showAddImageSheet() }
         image_save_draft.setOnClickListener { viewModel.saveDraft() }
         image_save_video.setOnClickListener { viewModel.saveVideo() }
+        image_back.setOnClickListener { finish() }
     }
 
 
@@ -112,7 +113,7 @@ class SlideShowActivity : BaseActivity(), SceneOptionStateListener,
     }
 
 
-    override fun onDurationChange(state: DurationOptionsBottomSheet.OptionState) {
+    override fun onDurationChange(state: DurationViewLayout.OptionState) {
         viewModel.onDurationChange(state)
     }
 
