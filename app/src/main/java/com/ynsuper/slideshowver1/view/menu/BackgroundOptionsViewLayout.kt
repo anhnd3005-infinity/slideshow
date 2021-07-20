@@ -72,10 +72,7 @@ class BackgroundOptionsViewLayout : BaseCustomConstraintLayout {
         }
         seekBarBlur.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                state?.progressBlur = progress
-                Handler().post(Runnable {
-                    saveState()
-                })
+
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -83,7 +80,10 @@ class BackgroundOptionsViewLayout : BaseCustomConstraintLayout {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-
+                state?.progressBlur = seekBar!!.progress
+                Handler().post(Runnable {
+                    saveState()
+                })
             }
 
         })
