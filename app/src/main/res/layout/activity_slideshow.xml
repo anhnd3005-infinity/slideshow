@@ -10,9 +10,11 @@
 
     </data>
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
         android:background="@color/color_main_edit">
 
         <LinearLayout
@@ -80,6 +82,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <com.ynsuper.slideshowver1.view.sticker.StickerView
+                android:id="@+id/preview"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!--        <androidx.appcompat.widget.AppCompatSeekBar-->
@@ -130,41 +142,7 @@
                 android:textSize="10dp" />
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/relative"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/horizontal_menu"
-            app:layout_constraintTop_toBottomOf="@+id/play_visual_view">
 
-
-            <com.ynsuper.slideshowver1.view.custom_view.HorizontalThumbnailListView
-                android:id="@+id/horizontal_image_slide"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <ImageView
-                android:id="@+id/image_add_image"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/round_button_gradient_main"
-                android:padding="8dp"
-                android:src="@drawable/ic_add_image_24" />
-
-            <View
-                android:id="@+id/vw_flag"
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:layout_marginTop="10dp"
-                android:background="@color/color_main_dark"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent" />
-
-        </RelativeLayout>
 
         <FrameLayout
             android:id="@+id/loadingLayout"
@@ -205,6 +183,7 @@
 
 
         </FrameLayout>
+
 
         <FrameLayout
             android:id="@+id/loadingRender"
@@ -284,48 +263,97 @@
         </FrameLayout>
 
 
-        <LinearLayout
-            android:id="@+id/linearLayout"
+
+        <RelativeLayout
+            android:id="@+id/relative"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/black"
-
+            android:layout_height="0dp"
             android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/horizontal_menu"
+            app:layout_constraintTop_toBottomOf="@+id/play_visual_view">
 
-            app:layout_constraintBottom_toTopOf="@+id/horizontal_menu">
 
-            <com.ynsuper.slideshowver1.view.menu.RatioViewLayout
-                android:id="@+id/ratio_view_layout"
+            <com.ynsuper.slideshowver1.view.custom_view.HorizontalThumbnailListView
+                android:id="@+id/horizontal_image_slide"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <ImageView
+                android:id="@+id/image_add_image"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/round_button_gradient_main"
+                android:padding="8dp"
+                android:src="@drawable/ic_add_image_24" />
+
+            <View
+                android:id="@+id/vw_flag"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="10dp"
+                android:background="@color/color_main_dark"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+
+        </RelativeLayout>
+        <ScrollView
+            android:id="@+id/scroll_menu_option"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/color_main_edit"
+            android:orientation="vertical"
+            android:fillViewport="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/horizontal_menu"
+            app:layout_constraintTop_toBottomOf="@+id/relative_controller">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone" />
+                android:background="@color/color_main_edit"
+                android:orientation="vertical">
 
-            <com.ynsuper.slideshowver1.view.menu.BackgroundOptionsViewLayout
-                android:id="@+id/background_view_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
+                <com.ynsuper.slideshowver1.view.menu.RatioViewLayout
+                    android:id="@+id/ratio_view_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
 
-            <com.ynsuper.slideshowver1.view.menu.TransitionViewLayout
-                android:id="@+id/transition_view_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
+                <com.ynsuper.slideshowver1.view.menu.BackgroundOptionsViewLayout
+                    android:id="@+id/background_view_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
 
-            <com.ynsuper.slideshowver1.view.menu.MusicViewLayout
-                android:id="@+id/music_view_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
+                <com.ynsuper.slideshowver1.view.menu.TransitionViewLayout
+                    android:id="@+id/transition_view_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
 
-            <com.ynsuper.slideshowver1.view.menu.DurationViewLayout
-                android:id="@+id/duration_view_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
+                <com.ynsuper.slideshowver1.view.menu.MusicViewLayout
+                    android:id="@+id/music_view_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
 
-        </LinearLayout>
+                <com.ynsuper.slideshowver1.view.menu.DurationViewLayout
+                    android:id="@+id/duration_view_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
 
+                <com.ynsuper.slideshowver1.view.menu.TextQuoteViewLayout
+                    android:id="@+id/text_quote_view_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+        </ScrollView>
         <HorizontalScrollView
             android:id="@+id/horizontal_menu"
             android:layout_width="match_parent"

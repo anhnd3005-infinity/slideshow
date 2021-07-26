@@ -77,6 +77,7 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
     private var isPlay = false
     private var startScroll: Int = 0
     private var timer: Timer? = null
+    private lateinit var textQuoteViewLayout: TextQuoteViewLayout
     private lateinit var durationViewLayout: DurationViewLayout
     private lateinit var musicViewLayout: MusicViewLayout
     private lateinit var ratioViewLayout: RatioViewLayout
@@ -158,6 +159,9 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
 
         durationViewLayout = context.findViewById(R.id.duration_view_layout)
         durationViewLayout.setTopbarController(this)
+
+        textQuoteViewLayout = context.findViewById(R.id.text_quote_view_layout)
+        textQuoteViewLayout.setTopbarController(this)
     }
 
 
@@ -615,15 +619,23 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
     }
 
     fun selectMenuText() {
-        TextQuoteViewLayout.newInstance(quoteState)
-            .show(context.supportFragmentManager, "quote")
+//        TextQuoteViewLayout.newInstance(quoteState)
+//            .show(context.supportFragmentManager, "quote")
+
+        textQuoteViewLayout.visibility = View.VISIBLE
+        binding.preview.visibility = View.VISIBLE
+        val previewText = context.findViewById<com.ynsuper.slideshowver1.view.sticker.StickerView>(R.id.preview)
+        textQuoteViewLayout.setState(quoteState, previewText)
+        hideMenuBar()
     }
 
     private fun hideMenuBar() {
+        binding.scrollMenuOption.visibility = View.VISIBLE
         binding.horizontalMenu.visibility = View.GONE
     }
 
     private fun showMenuBar() {
+        binding.scrollMenuOption.visibility = View.GONE
         binding.horizontalMenu.visibility = View.VISIBLE
 
     }
@@ -659,6 +671,13 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
             durationViewLayout.visibility = View.GONE
             showMenuBar()
         }
+
+        if (textQuoteViewLayout.visibility == View.VISIBLE) {
+            textQuoteViewLayout.visibility = View.GONE
+            binding.preview.visibility = View.GONE
+            showMenuBar()
+        }
+
 
     }
 
@@ -1098,9 +1117,6 @@ class SlideShowViewModel : BaseViewModel(), TopBarController, IHorizontalListCha
             RelativeLayout.LayoutParams.MATCH_PARENT
         )
         binding.rlContentRoot.addView(sticker, lp)
-
-        // when apply
-        videoComposer.applyStickerBitmap(bitmap!!, sticker)
 
 
     }
