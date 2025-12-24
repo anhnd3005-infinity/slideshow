@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Editor Architecture Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@9.1.2/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>📚 Architecture Docs</h1>
+                <p>Video Editor Documentation</p>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <h3>📖 Master Documents</h3>
+                    <ul>
+                        <li><a href="#" data-file="README_ARCHITECTURE.md" class="nav-link active">📋 Index & Navigation</a></li>
+                        <li><a href="#" data-file="MASTER_ARCHITECTURE.md" class="nav-link">🎬 Master Architecture</a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <h3>🏗️ Architecture Details</h3>
+                    <ul>
+                        <li><a href="#" data-file="ARCHITECTURE_CAPCUT_STYLE.md" class="nav-link">🎨 CapCut-Style Architecture</a></li>
+                        <li><a href="#" data-file="ARCHITECTURE_HUONG2.md" class="nav-link">🔄 ExoPlayer GL Compositing</a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <h3>⚡ Features Explained</h3>
+                    <ul>
+                        <li><a href="#" data-file="REALTIME_PREVIEW_EXPLAINED.md" class="nav-link">⚡ Real-time Preview</a></li>
+                        <li><a href="#" data-file="TIMELINE_LAYERS_EXPLAINED.md" class="nav-link">📊 Timeline Layers</a></li>
+                        <li><a href="#" data-file="TIMELINE_SCRUB_PREVIEW.md" class="nav-link">🎯 Timeline Scrub Preview</a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <h3>🔗 External Links</h3>
+                    <ul>
+                        <li><a href="https://www.figma.com/online-whiteboard/create-diagram/5726bb1c-2529-466e-a000-28554864b1c3" target="_blank" class="nav-link external">📈 Complete Flow Diagram</a></li>
+                        <li><a href="https://www.figma.com/online-whiteboard/create-diagram/fd10fef3-b23a-4c19-ada6-fed3ae6a3a76" target="_blank" class="nav-link external">🎨 CapCut Architecture</a></li>
+                        <li><a href="https://www.figma.com/online-whiteboard/create-diagram/201ab8f0-06c0-490a-a668-0ccf1ea44f4e" target="_blank" class="nav-link external">🔄 ExoPlayer Compositing</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h2 id="page-title">Loading...</h2>
+                <div class="breadcrumb" id="breadcrumb"></div>
+            </div>
+            <div class="content-body" id="content">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading documentation...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
